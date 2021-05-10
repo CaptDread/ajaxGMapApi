@@ -1,0 +1,168 @@
+/* 
+==============================================
+CONTENT:	Project Name Here
+AUTHOR:		Your Name Here
+==============================================
+
+TABLE OF CONTENTS:
+
+0. Reset
+1. Main Layout
+2. Content
+
+==============================================
+*/
+
+/* 0. Reset ================================= */
+
+/* 
+If you want to add partials, use Sass Modules via @use:
+@use 'variables';
+
+Usage: partial-name.variable/mixin/function-name:
+background: variables.$primary-color;
+*/
+
+@use 'reset';
+
+/* 1. Main Layout ================================= */
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background: rgb(46, 48, 50);
+}
+
+/* 2. Content ================================= */
+
+body{
+	padding: 5% 10%;
+}
+.container{
+	background-color: #fff;
+	border-radius: 10px;
+	padding: 10px;
+
+	form{
+		padding: 10px;
+		text-transform: capitalize;
+		letter-spacing: .13em;
+		line-height: 1.3em;
+
+		.required{
+			display: flex;
+			justify-content: space-between;
+
+			input{
+				width: 80%;
+			}
+		}
+		.optional{
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 10%;
+
+			div{
+				display: flex;
+				flex-direction: column;
+				margin: 0px .42em;
+				margin-top: auto;
+
+
+				input{
+					width: 80%;
+				}
+			}
+		}
+
+		.sort_by{
+			background: #999;
+			border: .13em #666 solid;
+			border-radius: 13%;
+			width: max-content;
+			
+			.sort_by-menu{
+				display: none;
+			}
+		}
+
+		.form_btns{
+			display: flex;
+			justify-content: space-between;
+
+			.sort_by-btn{
+				display: flex;
+				justify-content: space-between;
+			}
+
+			.sort_by-label{
+				cursor: pointer;
+				display: flex;
+				justify-content: space-between;
+			}
+
+			input[type=checkbox]:checked + label {
+				.sort_by-menu{
+					display: block;
+				}
+			}
+		}
+	}
+}
+
+.result_list{
+	display: flex;
+	flex-direction: column-reverse;
+	
+	.res_li{
+		margin: 2.5em 0em;
+
+		.res_div{
+			background: #fff;
+			border: .42em #000 solid;
+			border-radius: 13%;
+			display: flex;
+			text-decoration: none;
+			color: #000;
+			
+
+			.res_div-info{
+				display: flex;
+				padding: 1em 1em;
+				flex-direction: column;
+				justify-content: space-between;
+
+				.res_div-head{
+					text-transform: capitalize;
+					font-size: 3rem;
+				}
+				p{
+					font-size: 1.3rem;
+					margin: .13em 0em;
+				}
+				.res_div-stats{
+					display: grid;
+					grid-template-columns: repeat(3, fr);
+					column-gap: 10%;
+					justify-content: space-between;
+					font-size: 1.5rem;
+				}
+			}
+			.res_div-img{
+				width: 30%;
+				height: 30%;
+				border-radius: 13%;
+				margin-left: auto;
+			}
+		}
+	}
+}
+
+#map {
+	width: 100%;
+	height: 500px;
+	margin-top: 10px;
+	border: 1px white solid;
+}

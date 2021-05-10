@@ -1,0 +1,1 @@
+{"version":3,"sources":["main.js"],"names":["TwitApi"],"mappings":";;AAAA,IAAIA,OAAJ","sourcesContent":["new TwitApi"],"file":"main.js"}
