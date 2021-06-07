@@ -166,13 +166,14 @@ body {
 
 /* 2. Content ================================= */
 body {
-	padding: 5% 10%;
+	padding: 2% 10%;
 }
 
 .container {
 	background-color: #fff;
 	border-radius: 10px;
 	padding: 10px;
+	margin-bottom: 10px;
 }
 .container form {
 	padding: 10px;
@@ -243,9 +244,12 @@ body {
 	display: flex;
 	-webkit-flex-direction: column-reverse;
 	        flex-direction: column-reverse;
+	height: 28vh;
+	overflow-y: scroll;
 }
 .result_list .res_li {
-	margin: 2.5em 0em;
+	height: 20%;
+	margin: 6.5em 0em;
 }
 .result_list .res_li .res_div {
 	background: #fff;

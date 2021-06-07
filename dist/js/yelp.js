@@ -14,16 +14,18 @@ var Yelp = function Yelp() {
   _defineProperty(this, "API_KEY", 'imSIjQRZB51atirCN5wB6srSAzn7H-wT0qZOCwhf_XqHgyLRtCN7TICuKJwCcLEIPK2w3P0keHSZCgzuQXl5q4o5QT3QMED-WKNNfIQ4zDuCspzLnWuajMEixsx9YHYx');
 
   _defineProperty(this, "setupListener", function () {
-    var form = document.querySelector('form[name="business_search"]');
-    form.addEventListener('submit', _this.handleSearch);
-    var refineForm = document.querySelector('form[name="refine_search"]');
-    refineForm.addEventListener('submit', _this.refineSearch);
+    // const form = document.querySelector('form[name="business_search"]')
+    // form.addEventListener('submit', this.handleSearch)
+    // const refineForm = document.querySelector('form[name="refine_search"]')
+    // refineForm.addEventListener('submit', this.refineSearch)
+    document.addEventListener("business-search", _this.handleSearch);
   });
 
   _defineProperty(this, "handleSearch", function (evt) {
     evt.preventDefault();
-    console.log('searching....');
-    var term = document.querySelector('input[name="term"]').value;
+    console.log('searching....', evt.detail);
+    var searchInfo = evt.detail;
+    var term = searchInfo.query;
     var location = document.querySelector('input[name="location"]').value;
     var data = {
       _ep: '/businesses/search',
@@ -113,6 +115,8 @@ var Yelp = function Yelp() {
   _defineProperty(this, "processResults", function (data) {
     var results = data.data.businesses;
     console.log('got data!', results);
+    var clearMarker = new CustomEvent("clear-marker");
+    document.dispatchEvent(clearMarker);
 
     for (var i = 0; i < results.length; i++) {
       var resultsUl = document.querySelector('.result_list');
@@ -180,45 +184,58 @@ var Yelp = function Yelp() {
       } else {
         resRate.textContent = '★★★★★';
       }
-    } // const displayResults = (i) => {
-    //     let resultsUl = document.querySelector('results_list')
-    //     let resLi = document.createElement('li')
-    //     resLi.classList.add('res_li')
-    //     let resDiv = document.createElement('div')
-    //     resDiv.classList.add('res_div')
-    //     let resDivInfo = document.createElement('div')
-    //     resDivInfo.classList.add('res_div-info')
-    //     let resDivHeader = document.createElement('h2')
-    //     resDivHead.classList.add('res_div-head')
-    //     let resDivDigit = document.createElement('p')
-    //     resDivDigit.classList.add('res_div-contact')
-    //     let resDivAddy = document.createElement('p')
-    //     resDivAddy.classList.add('res_div-address')
-    //     let resDivStats = document.createElement('article')
-    //     resDivStats.classList.add('res_div-stats')
-    //     let resPrice = document.createElement('span')
-    //     resPrice.classList.add('res_stats-price')
-    //     let resRate = document.createElement('span')
-    //     resRate.classList.add('res_stats-rate')
-    //     let resDist = document.createElement('span')
-    //     resDist.classList.add('res_stats-dist')
-    //     let resImg = document.createElement('img')
-    //     resImg.classList.add('res_div-img')
-    //     resultsUl.appendChild(resLi)
-    //     resLi.appendChild(resDiv)
-    //     resDiv.appendChild(resDivInfo)
-    //     resDivInfo.appendChild(resDivHeader, resDivDigit, resDivAddy)
-    //     resDivInfo.appendChild(resDivStats)
-    //     resDivStats.appendChild(resPrice, resRate, resDist)
-    //     resDivInfo.appendChild(resImg)
-    //     resDivHeader.textContent = results[i].name
-    //     resDivDigit.textContent = results[i].phone
-    //     resDivAddy.textContent = results[i].location[0].value + ", " + results[i].location[1].value + ", " + results[i].location[3].value + ", " + results[i].location[4].value
-    //     resPrice.textContent = results[i].price
-    //     resRate.textContent = results[i].rating
-    //     resDist.textContent = result[i].distance / 1600
-    // }
 
+      var markerInfo = {
+        name: results[i].name,
+        lat: results[i].coordinates.latitude,
+        lng: results[i].coordinates.longitude,
+        desc: "<div class=\"column\"><p>".concat(results[i].phone, "</p><p>").concat(resRate.textContent, "</p><p>").concat(resDivAddy.textContent, "</p></div>")
+      };
+      console.log(markerInfo);
+      var createMarker = new CustomEvent("create-marker", {
+        detail: markerInfo
+      });
+      document.dispatchEvent(createMarker);
+    }
+
+    var displayResults = function displayResults(i) {
+      var resultsUl = document.querySelector('results_list');
+      var resLi = document.createElement('li');
+      resLi.classList.add('res_li');
+      var resDiv = document.createElement('div');
+      resDiv.classList.add('res_div');
+      var resDivInfo = document.createElement('div');
+      resDivInfo.classList.add('res_div-info');
+      var resDivHeader = document.createElement('h2');
+      resDivHead.classList.add('res_div-head');
+      var resDivDigit = document.createElement('p');
+      resDivDigit.classList.add('res_div-contact');
+      var resDivAddy = document.createElement('p');
+      resDivAddy.classList.add('res_div-address');
+      var resDivStats = document.createElement('article');
+      resDivStats.classList.add('res_div-stats');
+      var resPrice = document.createElement('span');
+      resPrice.classList.add('res_stats-price');
+      var resRate = document.createElement('span');
+      resRate.classList.add('res_stats-rate');
+      var resDist = document.createElement('span');
+      resDist.classList.add('res_stats-dist');
+      var resImg = document.createElement('img');
+      resImg.classList.add('res_div-img');
+      resultsUl.appendChild(resLi);
+      resLi.appendChild(resDiv);
+      resDiv.appendChild(resDivInfo);
+      resDivInfo.appendChild(resDivHeader, resDivDigit, resDivAddy);
+      resDivInfo.appendChild(resDivStats);
+      resDivStats.appendChild(resPrice, resRate, resDist);
+      resDivInfo.appendChild(resImg);
+      resDivHeader.textContent = results[i].name;
+      resDivDigit.textContent = results[i].phone;
+      resDivAddy.textContent = results[i].location[0].value + ", " + results[i].location[1].value + ", " + results[i].location[3].value + ", " + results[i].location[4].value;
+      resPrice.textContent = results[i].price;
+      resRate.textContent = results[i].rating;
+      resDist.textContent = result[i].distance / 1600;
+    };
   });
 
   this.setupListener();

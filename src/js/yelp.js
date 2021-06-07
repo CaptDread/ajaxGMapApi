@@ -10,18 +10,22 @@ class Yelp {
     }
 
     setupListener = () => {
-        const form = document.querySelector('form[name="business_search"]')
-        form.addEventListener('submit', this.handleSearch)
-        const refineForm = document.querySelector('form[name="refine_search"]')
-        refineForm.addEventListener('submit', this.refineSearch)
+        // const form = document.querySelector('form[name="business_search"]')
+        // form.addEventListener('submit', this.handleSearch)
+        // const refineForm = document.querySelector('form[name="refine_search"]')
+        // refineForm.addEventListener('submit', this.refineSearch)
+
+        document.addEventListener(`business-search`, this.handleSearch)
     }
 
 
     handleSearch = (evt) => {
         evt.preventDefault()
-        console.log('searching....')
+        console.log('searching....', evt.detail)
 
-        const term = document.querySelector('input[name="term"]').value
+        const searchInfo = evt.detail
+
+        const term = searchInfo.query
         const location = document.querySelector('input[name="location"]').value
 
 
@@ -106,6 +110,9 @@ class Yelp {
         const results = data.data.businesses
         console.log('got data!' , results)
 
+        const clearMarker = new CustomEvent(`clear-marker`)
+        document.dispatchEvent(clearMarker)
+
         for (let i = 0; i < results.length; i++) {
             let resultsUl = document.querySelector('.result_list')
             let resLi = document.createElement('li')
@@ -172,50 +179,62 @@ class Yelp {
             } else {
                 resRate.textContent = '★★★★★'
             }
+
+            const markerInfo = {
+                name: results[i].name,
+                lat: results[i].coordinates.latitude,
+                lng: results[i].coordinates.longitude,
+                desc: `<div class="column"><p>${results[i].phone}</p><p>${resRate.textContent}</p><p>${resDivAddy.textContent}</p></div>`
+            }
+
+            console.log(markerInfo)
+
+            const createMarker = new CustomEvent(`create-marker`, { detail: markerInfo})
+            document.dispatchEvent(createMarker)
         }
 
 
-        // const displayResults = (i) => {
-        //     let resultsUl = document.querySelector('results_list')
-        //     let resLi = document.createElement('li')
-        //     resLi.classList.add('res_li')
-        //     let resDiv = document.createElement('div')
-        //     resDiv.classList.add('res_div')
-        //     let resDivInfo = document.createElement('div')
-        //     resDivInfo.classList.add('res_div-info')
-        //     let resDivHeader = document.createElement('h2')
-        //     resDivHead.classList.add('res_div-head')
-        //     let resDivDigit = document.createElement('p')
-        //     resDivDigit.classList.add('res_div-contact')
-        //     let resDivAddy = document.createElement('p')
-        //     resDivAddy.classList.add('res_div-address')
-        //     let resDivStats = document.createElement('article')
-        //     resDivStats.classList.add('res_div-stats')
-        //     let resPrice = document.createElement('span')
-        //     resPrice.classList.add('res_stats-price')
-        //     let resRate = document.createElement('span')
-        //     resRate.classList.add('res_stats-rate')
-        //     let resDist = document.createElement('span')
-        //     resDist.classList.add('res_stats-dist')
-        //     let resImg = document.createElement('img')
-        //     resImg.classList.add('res_div-img')
+        const displayResults = (i) => {
+            let resultsUl = document.querySelector('results_list')
+            let resLi = document.createElement('li')
+            resLi.classList.add('res_li')
+            let resDiv = document.createElement('div')
+            resDiv.classList.add('res_div')
+            let resDivInfo = document.createElement('div')
+            resDivInfo.classList.add('res_div-info')
+            let resDivHeader = document.createElement('h2')
+            resDivHead.classList.add('res_div-head')
+            let resDivDigit = document.createElement('p')
+            resDivDigit.classList.add('res_div-contact')
+            let resDivAddy = document.createElement('p')
+            resDivAddy.classList.add('res_div-address')
+            let resDivStats = document.createElement('article')
+            resDivStats.classList.add('res_div-stats')
+            let resPrice = document.createElement('span')
+            resPrice.classList.add('res_stats-price')
+            let resRate = document.createElement('span')
+            resRate.classList.add('res_stats-rate')
+            let resDist = document.createElement('span')
+            resDist.classList.add('res_stats-dist')
+            let resImg = document.createElement('img')
+            resImg.classList.add('res_div-img')
 
-        //     resultsUl.appendChild(resLi)
-        //     resLi.appendChild(resDiv)
-        //     resDiv.appendChild(resDivInfo)
-        //     resDivInfo.appendChild(resDivHeader, resDivDigit, resDivAddy)
-        //     resDivInfo.appendChild(resDivStats)
-        //     resDivStats.appendChild(resPrice, resRate, resDist)
-        //     resDivInfo.appendChild(resImg)
+            resultsUl.appendChild(resLi)
+            resLi.appendChild(resDiv)
+            resDiv.appendChild(resDivInfo)
+            resDivInfo.appendChild(resDivHeader, resDivDigit, resDivAddy)
+            resDivInfo.appendChild(resDivStats)
+            resDivStats.appendChild(resPrice, resRate, resDist)
+            resDivInfo.appendChild(resImg)
 
-        //     resDivHeader.textContent = results[i].name
-        //     resDivDigit.textContent = results[i].phone
-        //     resDivAddy.textContent = results[i].location[0].value + ", " + results[i].location[1].value + ", " + results[i].location[3].value + ", " + results[i].location[4].value
-        //     resPrice.textContent = results[i].price
-        //     resRate.textContent = results[i].rating
-        //     resDist.textContent = result[i].distance / 1600
-        // }
+            resDivHeader.textContent = results[i].name
+            resDivDigit.textContent = results[i].phone
+            resDivAddy.textContent = results[i].location[0].value + ", " + results[i].location[1].value + ", " + results[i].location[3].value + ", " + results[i].location[4].value
+            resPrice.textContent = results[i].price
+            resRate.textContent = results[i].rating
+            resDist.textContent = result[i].distance / 1600
+        }
     }
 }
 
-new Yelp
+new Yelp()

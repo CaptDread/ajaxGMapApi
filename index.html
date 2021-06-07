@@ -14,10 +14,12 @@
 	<body>
 		<div class="container">
 			
-			<form name="place_search" method="get">
+			<form name="business_search" method="get">
 				<div class="required">
-					<label for="place">search places</label>
-					<input id="place" name="place" value="Atlanta, Ga" />
+					<label for="location">Location</label>
+					<input id="location" name="location" value="Atlanta, Ga" />
+					<label for="term">search terms</label>
+					<input id="term" name="term" value="The Creative Circus" />
 				</div>
 				<button type="submit" class="get_btn">Search</button>
 				
@@ -26,14 +28,16 @@
 
 			<div id="map"></div>
 		</div>
+		<ul class="result_list"></ul>
 		
 		<script src="dist/js/mapsapi.js"></script>
+		<script src="dist/js/yelp.js"></script>
 		<script
 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3tRPWowcO3i2l6jwjEWdUg1wRaEShj1A&callback=gMap.ready&libraries=places&v=weekly"
 			async
 		></script>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<!-- <script src="dist/js/base-validator.js"></script> -->
-		<!-- <script src="dist/js/main.js"></script> -->
+		<script src="dist/js/main.js"></script>
 	</body>
 </html>

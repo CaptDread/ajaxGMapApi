@@ -38,12 +38,13 @@ body {
 /* 2. Content ================================= */
 
 body{
-	padding: 5% 10%;
+	padding: 2% 10%;
 }
 .container{
 	background-color: #fff;
 	border-radius: 10px;
 	padding: 10px;
+	margin-bottom: 10px;
 
 	form{
 		padding: 10px;
@@ -115,9 +116,12 @@ body{
 .result_list{
 	display: flex;
 	flex-direction: column-reverse;
+	height: 28vh;
+	overflow-y: scroll;
 	
 	.res_li{
-		margin: 2.5em 0em;
+		height: 20%;
+		margin: 6.5em 0em;
 
 		.res_div{
 			background: #fff;

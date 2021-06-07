@@ -16,9 +16,24 @@ var GoogleMap = /*#__PURE__*/function () {
 
     _defineProperty(this, "API_KEY", 'AIzaSyA3tRPWowcO3i2l6jwjEWdUg1wRaEShj1A');
 
+    _defineProperty(this, "markers", []);
+
+    _defineProperty(this, "handleMapCenterRequest", function (evt) {
+      var mapCenter = _this.map.getCenter();
+
+      var responseInfo = {
+        center: mapCenter
+      };
+      var responseEvent = new CustomEvent("get-map-center-response", {
+        detail: responseInfo
+      });
+      console.log(responseInfo);
+      document.dispatchEvent(responseEvent);
+    });
+
     _defineProperty(this, "handlePlaceSearch", function (evt) {
       evt.preventDefault();
-      var placeName = document.querySelector('#place').value;
+      var placeName = document.querySelector('#term').value;
       var placeRequest = {
         location: _this.map.getCenter(),
         radius: 50,
@@ -32,8 +47,47 @@ var GoogleMap = /*#__PURE__*/function () {
       console.log('searching places');
     });
 
+    _defineProperty(this, "createMarker", function (options) {
+      var opt = options.detail;
+      var marker = new google.maps.Marker({
+        position: {
+          lat: opt.lat,
+          lng: opt.lng
+        },
+        map: _this.map,
+        title: opt.name,
+        description: opt.desc
+      }); // console.log(`marker ${opt.latitude}`)
+
+      console.log("mapApi options: ", options);
+      var infoWindowContent = "<div><h2>".concat(options.title, "</h2>").concat(options.description, "</div>");
+
+      if (!_this.infoWindow) {
+        _this.infoWindow = new google.maps.InfoWindow();
+      }
+
+      marker.addListener('click', function () {
+        _this.infoWindow.setContent(infoWindowContent);
+
+        _this.infoWindow.open(_this.map, marker);
+      });
+
+      _this.markers.push(marker);
+    });
+
+    _defineProperty(this, "clearMarker", function () {
+      _this.markers.forEach(function (marker) {
+        marker.setMap(null);
+      });
+
+      console.log("markers cleared");
+      _this.markers = [];
+    });
+
     _defineProperty(this, "handlePlaceResults", function (results, status) {
       if (status == google.maps.places.PlacesServiceStatus.OK) {
+        _this.clearMarker();
+
         console.log('got results', results);
         var resCenter = {
           lat: results[0].geometry.viewport.Ua.i,
@@ -45,58 +99,41 @@ var GoogleMap = /*#__PURE__*/function () {
         };
         _this.map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-        var _loop = function _loop(rm) {
-          resName = results[rm].name;
-          resLat = results[rm].geometry.viewport.Ua.i;
-          resLng = results[rm].geometry.viewport.La.i;
-          console.log(resName, resLat, resLng);
-          marker = new google.maps.Marker({
-            position: {
-              lat: resLat,
-              lng: resLng
-            },
-            map: _this.map,
-            title: resName,
-            label: resName,
-            draggable: false
-          });
-          var infoWindowContent = "<div><h2>Hi Circus</h2><p>I'm at lambert drive</p></div>";
-          var infoWindow = new google.maps.InfoWindow({
-            content: infoWindowContent
-          });
-          marker.addListener('click', function () {
-            infoWindow.open(_this.map, marker);
-          });
-        };
-
         for (var rm = 0; rm < results.length; rm++) {
-          var resName;
-          var resLat;
-          var resLng;
-          var marker;
+          var resName = results[rm].name;
+          var resLat = results[rm].geometry.viewport.Ua.i;
+          var resLng = results[rm].geometry.viewport.La.i; // var resHours = results[rm].opening_hours.isOpen
+          // var resNum = results[rm].
 
-          _loop(rm);
+          var resRate = results[rm].rating;
+          var resAddy = results[rm].formatted_address;
+          console.log(resName, resRate); //name of the place, hours, phone number, and rating.
+
+          _this.createMarker({
+            lat: resLat,
+            lng: resLng,
+            title: resName,
+            desc: "<div class=\"column\"><p>Rating ".concat(resRate, "</p><p>").concat(resAddy, "</p></div>")
+          });
         }
       } else {
         console.log('error: ');
       }
     });
 
-    this.init();
+    this.setupListeners();
   }
 
   _createClass(GoogleMap, [{
-    key: "init",
-    value: function init() {
-      console.log('googleMap init');
-      var form = document.querySelector('form[name="place_search"]');
-      form.addEventListener('submit', this.handlePlaceSearch);
+    key: "setupListeners",
+    value: function setupListeners() {
+      document.addEventListener("get-map-center", this.handleMapCenterRequest);
+      document.addEventListener("clear-marker", this.clearMarker);
+      document.addEventListener("create-marker", this.createMarker);
     }
   }, {
     key: "ready",
     value: function ready() {
-      var _this2 = this;
-
       console.log('GoogleMap is ready');
       var circusCenter = {
         lat: 33.812328,
@@ -106,21 +143,15 @@ var GoogleMap = /*#__PURE__*/function () {
         center: circusCenter,
         zoom: 18
       };
-      this.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-      var marker = new google.maps.Marker({
-        position: circusCenter,
-        map: this.map,
-        title: 'The Circus' // label: 'the Creative Circus',
-        // draggable: false
+      this.map = new google.maps.Map(document.getElementById('map'), mapOptions); // this.createMarker({
+      //     lat: circusCenter.lat,
+      //     lng: circusCenter.lng,
+      //     title: "The Circus",
+      //     description: `<div><p>A place where cool shit is made.</p></div>`
+      // })
 
-      });
-      var infoWindowContent = "<div><h2>Hi Circus</h2><p>I'm at lambert drive</p></div>";
-      var infoWindow = new google.maps.InfoWindow({
-        content: infoWindowContent
-      });
-      marker.addListener('click', function () {
-        infoWindow.open(_this2.map, marker);
-      });
+      var mapReadyEvt = new CustomEvent("map-ready");
+      document.dispatchEvent(mapReadyEvt);
     }
   }]);
 
